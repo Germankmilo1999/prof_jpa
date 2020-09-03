@@ -22,7 +22,7 @@ public class Bill implements Serializable {
 	
 	private int id_customer;
 
-	private int products;
+	private String products;
 	
 	private int totalPrice;
 	
@@ -33,7 +33,7 @@ public class Bill implements Serializable {
 	}
 
 
-	public Bill(int idCustomerBill, int productsBill, int totalPriceBill, LocalDateTime dateBill) {
+	public Bill(int idCustomerBill, String productsBill, int totalPriceBill, LocalDateTime dateBill) {
 		super();
 		this.id_customer = idCustomerBill;
 		this.products = productsBill;
@@ -49,11 +49,11 @@ public class Bill implements Serializable {
 		this.number = numBill;
 	}
 	
-	public int getProducts() {
+	public String getProducts() {
 		return this.products;
 	}
 
-	public void setProducts(int productsBill) {
+	public void setProducts(String productsBill) {
 		this.products = productsBill;
 	}
 

@@ -28,6 +28,7 @@ import java.awt.Button;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 import java.awt.event.ActionEvent;
 import javax.swing.JList;
 import javax.swing.JTable;
@@ -590,17 +591,28 @@ public class View {
 			Object [] obj = new Object[5];
 			try
 			{
+
+				
 				List ls = BillsJPA.listBills();
 				List<Bill> resultList = ls;
 				
 				for (Bill bl : resultList) {
+					StringJoiner allProducts = new StringJoiner(" ");
+					String[] tProducts = bl.getProducts().split(",");
 					
 					Customer ct = CustomersJPA.listCustomer(bl.getIdCustomer());
-					Product pd = ProductsJPA.listProduct(bl.getProducts());
+
+					System.out.println("Antes: " + allProducts);
+					for(int i = 0; i < tProducts.length; i++)
+					{
+						Product pd = ProductsJPA.listProduct(Integer.parseInt(tProducts[i]));
+						allProducts.add(pd.getName() + ", ");
+					}
+					System.out.println("Despues: " + allProducts);
 					
 					obj[0] = bl.getNumBill();
 					obj[1] = ct.getNameCustomer();
-					obj[2] = pd.getName();
+					obj[2] = allProducts;
 					obj[3] = bl.getTotalPrice();
 					obj[4] = bl.getDate();
 					model.addRow(obj);
@@ -610,7 +622,7 @@ public class View {
 			} catch (Exception e)
 			{
 				System.out.println("Error: " + e);
-				JOptionPane.showMessageDialog(frame, "Error al cargar los datos");
+				JOptionPane.showMessageDialog(frame, "Error al cargar los datos"+ e);
 			}
 		} else 
 		{
@@ -618,15 +630,22 @@ public class View {
 			Object [] obj = new Object[5];
 			try
 			{
+				StringJoiner allProducts = new StringJoiner(" ");
 				
 				Bill bl = BillsJPA.listBill(id);
 				
+				String[] tProducts = bl.getProducts().split(",");
+				
 				Customer ct = CustomersJPA.listCustomer(bl.getIdCustomer());
-				Product pd = ProductsJPA.listProduct(bl.getProducts());
+				for(int i = 0; i < tProducts.length; i++)
+				{
+					Product pd = ProductsJPA.listProduct(Integer.parseInt(tProducts[i]));
+					allProducts.add(pd.getName() + ", ");
+				}
 				
 				obj[0] = bl.getNumBill();
 				obj[1] = ct.getNameCustomer();
-				obj[2] = pd.getName();
+				obj[2] = allProducts;
 				obj[3] = bl.getTotalPrice();
 				obj[4] = bl.getDate();
 				model.addRow(obj);
@@ -711,14 +730,22 @@ public class View {
 	
 	private void finishBill()
 	{
+		String productsString = "";
+		
 		for(int i = 0; i < productsTotalPrice.size(); i++)
 		{
 			totalPrice = totalPrice + productsTotalPrice.get(i);
 		}
 		
+		for (Integer s : products)
+		{
+			productsString += s + ",";
+		}
+		
 		JOptionPane.showMessageDialog(frame, "Total a pagar: " + totalPrice);
 		
-		Bill bl = new Bill(Integer.parseInt(inputNewBillCustomerId.getText().toString()), products.get(0), totalPrice, LocalDateTime.now());
+		Bill bl = new Bill(Integer.parseInt(inputNewBillCustomerId.getText().toString()), productsString, totalPrice, LocalDateTime.now());
+		System.out.println(Integer.parseInt(inputNewBillCustomerId.getText().toString()) + "|" + productsString + "|" + totalPrice + "" + LocalDateTime.now());
 		try
 		{
 			BillsJPA.createBill(bl);
